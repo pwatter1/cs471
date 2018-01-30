@@ -1,0 +1,175 @@
+Patrick Watters
+CS471 Assignment 1
+
+1.
+#include <stdio.h>
+int a1, char b2; // error lexical bc c doesnt allow declaring in same line of diff types
+INT arr[10];  // error syntax INT isnt a type in c, int is 
+long fr; nx; //error lexical bc doesnt give a type for nx
+long i#rate = 99; //error syntax bc this violates naming convention rules for C variables with the # in middle
+int * p; 
+
+int main (void){
+      int struct = 8 ;  //error syntax bc using keyword as variable name isnt allowed
+      int x;
+      arr[1] = x;
+      *p = 100; // logical bc wrong convention with pointers
+      struct = chg(a); //error static semantic bc using variable not previously declared
+      return struct; //error 
+}
+int chg(long  fr)  {
+     if (fr = 0) {  //error logical bc will use equals as single (=), rather than (==) as intended
+          x = 10; //error static semantic bc using a variable that wasnt declared
+          arr[10] = 10; //error dynamic semantic bc index out of bounds error
+        } else {
+             arr[1] = 1;
+        }
+    return arr[1];
+}
+
+2.
+	.file	"gcd.c"
+	.text
+	.globl	gcdI
+	.type	gcdI, @function
+gcdI:
+.LFB0:
+	.cfi_startproc
+	pushq	%rbp			# creation stack frame
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp		# creation stack frame
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)	# creation stack frame, space allotted
+	movl	%esi, -8(%rbp)
+	jmp	.L2
+.L4:
+	movl	-4(%rbp), %eax	# if statement i > j
+	cmpl	-8(%rbp), %eax	
+	jle	.L3					# jump if less than to else
+	movl	-8(%rbp), %eax	# i = i - j
+	subl	%eax, -4(%rbp)
+	jmp	.L2
+.L3:
+	movl	-4(%rbp), %eax
+	subl	%eax, -8(%rbp)  # j = j - i
+.L2:
+	movl	-4(%rbp), %eax	# while loop i != j
+	cmpl	-8(%rbp), %eax	# comparison
+	jne	.L4
+	movl	-4(%rbp), %eax   # return result i
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret                      # exit from the function
+	.cfi_endproc
+.LFE0:
+	.size	gcdI, .-gcdI
+	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609"
+	.section	.note.GNU-stack,"",@progbits
+
+3.
+If the two provided numbers are actual gcds of eachother, gcdI and gcdM will output the same result each time. But if they arent, there is a possibility of modulo/divide by 0 errors in gcdM. To avoid this, you could have a check that i and j are > 0.
+I would expect at extreme cases, like abnormally large numbers, that modulo would be slower than gcdI because modulo is reliant on division which is algorithmically slower than subtraction per https://stackoverflow.com/questions/27977834/why-is-modulus-operator-slow.
+
+4.
+int  gcdR(int i, int j) {
+    while (i != j)
+    {
+        if (i > j) { return gcdR(i - j, j); }
+        else { return gcdR(i, j - i); }
+    }
+    return i;
+}
+
+Complexity of iterative : O(log n)
+Complexity of recursive : O(log n)
+Best Case of O(1) if y is divisible of x, then Euclid GCD terminates in one call.
+Worst Case of O(log n) when x, y are two consecutive Fibonacci numbers
+
+When the two types of algos come to same complexity, it will depend on which is more intuitive to solving the problem. Some people may find iterative easier to understand for general problems but recursive functions are less code for traversing a tree than iterative. 
+
+5.
+#!/usr/bin/ruby
+
+def gcdR(m, n)
+  n == 0 ? m : gcdR(n, m % n)
+end
+
+def gcdI(m, n)
+  while n != 0
+    t = n
+    n = m % n
+    m = t
+  end
+  m
+end
+
+if ARGV.length != 2
+    puts "We need two numbers for the script"
+    puts "ruby gcd_full.rb [NUMBER] [NUMBER]"
+    exit
+end
+
+puts gcdR(ARGV[0].to_i, ARGV[1].to_i)
+puts gcdI(ARGV[0].to_i, ARGV[1].to_i)
+
+-------------------------------------------------------------------------
+
+#! /usr/bin/env python
+import sys
+
+def gcdI(i, j):
+	while i != j:
+		if i > j:
+			i -= j
+		else:
+			j -= i
+	return i
+
+def gcdR(i, j):
+	if j == 0:
+		return i
+	else:
+		return gcdR(j, i % j)
+
+if len(sys.argv) == 3:
+	try:
+		a = int(sys.argv[1])
+		b = int(sys.argv[2])
+		print("%d" % gcdI(a,b))
+		print("%d" % gcdR(a,b))
+
+	except ValueError:
+		print("failed to parse all arguments as integers.")
+		exit(1)
+else:
+	print("Not enough numbers to get GCD")
+	print("%s usage: [NUMBER] [NUMBER]" % sys.argv[0])
+
+6.
+Limit on size of ints is 32 bits but can change depending on implementation. In the case of arithmetic overflow, you likely won't be notified and the number will truncate. These limits impact portability of C programs because the results may differ depending on the machine's implementation. Regardless of machine, Java always is 32 bits. Ada allows for variation in implementation but has ranges that the size must fall within. 
+https://stackoverflow.com/questions/8676682/getting-64-bit-integer-in-python?rq=1
+"Python 2 has two integer types: int, which is a signed integer whose size equals your machine's word size (but is always at least 32 bits), and long, which is unlimited in size. Python 3 has only one integer type, which is called int but is equivalent to a Python 2 long."
+
+7.
+https://stackoverflow.com/questions/3673616/types-of-errors-during-compilation-and-at-runtime
+Python
+a. 0anum - variable names must start with underscore or letter
+b. 0 = anum - order is wrong and invalid for syntax
+c. array[2.5] - cant use float as index of array
+d. node = Node()
+   node2 = Node()
+   node.left = node2
+   node2 = None
+   node.right = node2.left # error - None cant have a right node so error
+
+
+8.
+It really depends on what the asker considers "powerful" to mean. It could mean a variety of things. Some programming languages are better for some things and worse for others. Whether it be speed, readability, etc. So I would consider this true but not absolute.
+
+9.
+a. 2
+b. 4
+c. 6553 with ack(3, 13)
+d. 509 with ack(3,6)
+e. 8189 with ack(3,10)
