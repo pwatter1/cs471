@@ -18,14 +18,26 @@ In particular:
 (2) Is the grammar left or right recursive? How does that affect the associativity of plus and mult? 
 
 Problem 1 Answer:
+a. 
+expr -> expr '+' term | term
+term -> term '*' factor | factor
+factor -> '(' expr ')' | identifier | number
 
+b.
+The grammar is left recursive and * + are left associative as a result.
 
 
 Problem 2:
 
 Using the grammar you extracted in Problem 1 add two new operators,  average, "@",  and minus, "-" , operators to the arith1 language .  The "-" should have the a higher precedence than "+" and lower precedence than "*".  The average operator, "@", should have the higher precedence than "*" but still be able to be overridden using parentheses as defined by the grammar. Both operators should have the same associativity as plus and times.
 Give the modified grammar. 
+
 Problem 2 Answer:
+expr -> expr '+' term1 | term1
+term1 -> term1 '-' term2 | term2
+term2 -> term2 '*' term3 | term3
+term3 -> term3 '@' factor | factor
+factor -> '(' expr ')' | identifier | number
 
 Problem 3:
 
@@ -40,6 +52,33 @@ number '+' expr
 '10' '+' expr 
 
 Problem 3 Answer:
+-> expr
+-> expr + term1
+-> nummber + term1 - term2
+-> 1 + number - number
+-> 1 + 2 - 2
+
+-> expr
+-> term1
+-> term1 - term2
+-> number - term2 * term3
+-> number - number * number
+-> 2 - 3 * 5
+
+-> expr
+-> term1
+-> term1 - term2
+-> number - term3
+-> 10 - term3 @ factor
+-> 10 - number @ number
+-> 10 - 5 @ 2
+
+-> expr
+-> term1 
+-> term1 - term2
+-> term1 - term2 - term2
+-> number - number - number
+-> 10 - 7 - 2
 
 Problem 4:
 
@@ -259,8 +298,8 @@ d.  w  *  x  /  y  *  z
 
 
 
-1
-2
+1	x
+2	x
 3
 4
 5
