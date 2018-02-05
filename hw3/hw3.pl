@@ -285,12 +285,16 @@ greater_than(succ(X), succ(Y)):- greater_than(X, Y).
 
 
 /* Problem 10 Answer: */
+add(0,Y,Y).
+add(succ(X),Y,succ(Z))  :- add(X,Y,Z).
+
+subtract(0, 0, 0).
 subtract(X, 0, X).
-subtract(X, Y, Z) :-
-  succ(PredY, Y),
-  succ(PredX, X),
-  subtract(PredX, PredY, Z).
-  
+subtract(X, X, 0).
+subtract(X, Y, Z) :- add(Y, Z, X).
+
+% https://stackoverflow.com/questions/800101/prolog-sum-sub-using-successors
+
 /* Problem 10 Test: */
 % :- subtract(succ(succ(0)), succ(0), succ(0)).       % SUCCEED
 % :- subtract(succ(succ(0)), 0, succ(succ(0))).       % SUCCEED
@@ -308,7 +312,19 @@ If BT = tree( leaf(1), tree( leaf(2),leaf(4)) ), then isBinaryTree(BT) succeeds.
 */
 
 /* Problem 11 Answer: */
+leaf(_).
+tree(leaf(_)).
+tree(leaf(_), leaf(_)).
+
+tree(leaf(_), tree(leaf(_), leaf(_))).
+tree(tree(leaf(_), leaf(_)), leaf(_)).
+
 isBinaryTree(nil).
+isBinaryTree(tree(leaf(X), leaf(Y))) :- tree(leaf(X)), tree(leaf(Y)).
+isBinaryTree(leaf(_)).
+
+isBinaryTree(tree(tree(leaf(_), leaf(_)), leaf(_))).
+isBinaryTree(tree(leaf(_), tree(leaf(_), leaf(_)))).
 
 /* Problem 11 Test: */
 %:- isBinaryTree(leaf(1)).                                           %SUCCEED
