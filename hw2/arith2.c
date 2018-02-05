@@ -12,6 +12,8 @@ char token; /* holds the current input character for the parse */
 void command(void);
 int expr(void);
 int term(void);
+int term2(void);
+int term3(void);
 int factor(void);
 int number(void);
 int digit(void);
@@ -59,11 +61,29 @@ int expr(void) {
 }
 
 int term(void) { 
-  int result = factor();
-  while (token == '*') { 
+  int result = term2();
+  while (token == '-') {
+    match('-');
+    result -= term();
+  } 
+  return result;
+}
+
+int term2(void) { 
+  int result = term3();
+  while (token == '*') {
     match('*');
-    result *= factor();
-  }
+    result *= term2();
+  } 
+  return result;
+}
+
+int term3(void) { 
+  int result = factor();
+  while (token == '@') {
+    match('@');
+    result = ((result + term3())/2);
+  } 
   return result;
 }
 

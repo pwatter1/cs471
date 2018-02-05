@@ -24,7 +24,7 @@ term -> term '*' factor | factor
 factor -> '(' expr ')' | identifier | number
 
 b.
-The grammar is left recursive and * + are left associative as a result.
+The grammar is right recursive and * + are right associative as a result.
 
 
 Problem 2:
@@ -108,6 +108,53 @@ The result is:   7
 
 Problem 4 Answer:
 
+int expr(void) { 
+  int result = term();
+  if (token == '+') {
+    match('+');
+    result += expr();
+  } 
+  return result;
+}
+
+int term(void) { 
+  int result = term2();
+  if (token == '-') {
+    match('-');
+    result -= term();
+  } 
+  return result;
+}
+
+int term2(void) { 
+  int result = term3();
+  if (token == '*') {
+    match('*');
+    result *= term2();
+  } 
+  return result;
+}
+
+int term3(void) { 
+  int result = factor();
+  if (token == '@') {
+    match('@');
+    result = ((result + term3())/2);
+  } 
+  return result;
+}
+
+int factor(void) { 
+  int result;
+  if (token == '(') { 
+    match('(');
+    result = expr();
+    match(')');
+  } else {
+    result = number();
+  }
+  return result;
+}
 
 Problem 5:
 
@@ -126,6 +173,13 @@ In particular:
 (2) Is the grammar left or right recursive? How does that affect the associativity of plus and mult? 
 
 Problem 5 Answer:
+a.
+expr -> term [ ('+') term ]*
+term -> factor [ ('*') factor ]*
+factor -> '(' expr ')' | identifier | number
+
+b.
+This grammar is left recursive and the associativities seem to be the same.
 
 
 Problem 6: 
@@ -134,6 +188,11 @@ Using the grammar you extracted in Problem 5 add two new operators to the arith2
 Give the modified grammar.
 
 Problem 7:
+expr -> term1 [ ('+') term1 ]*
+term1 -> term2 [ ('-') term2 ]*
+term2 -> term3 [ '*' term3 ]*
+term3 -> factor [ '@' factor ]*
+factor -> '(' expr ')' | identifier | number
 
 
 Write the left derivation for the following expressions according to the modified grammar from Problem 6 -- It may help to draw the parse tree first.
@@ -147,8 +206,43 @@ NOTE: You should show only one step at a time -- as we did in class -- but may j
 For example:
 number '+' expr
 '10' '+' expr
-Problem 7 Answer:
 
+Problem 7 Answer:
+-> expr
+-> term1 + term1
+-> term1 + term1 - term2
+-> factor + factor - factor
+-> number + number - number
+-> 1 + 2 - 2
+
+-> expr
+-> term1
+-> term2
+-> term2 - term2
+-> term2 - term3 * term3
+-> factor - factor * factor
+-> number - number * number
+-> 2 - 3 * 5
+
+-> expr
+-> term1
+-> term2
+-> term2 - term2
+-> term2 - term3
+-> term2 - term3 
+-> term2 - factor @ factor
+-> factor - number @ number
+-> 10 - 5 @ 2
+
+-> expr
+-> term1
+-> term2
+-> term2 - term2
+-> term2 - term3
+-> term2 - term3 - term3
+-> factor - factor - factor
+-> number - number - number
+-> 10 - 7 - 2
 
 Problem 8:
 
@@ -183,6 +277,55 @@ You DO NOT have to paste arith2.c in the template file, but you must submit the 
 Problem 8 Answer:
 
 
+int expr(void) { 
+  int result = term();
+  while (token == '+') { 
+    match('+');
+    result += term();
+  }
+  return result;
+}
+
+int term(void) { 
+  int result = term2();
+  while (token == '-') {
+    match('-');
+    result -= term();
+  } 
+  return result;
+}
+
+int term2(void) { 
+  int result = term3();
+  while (token == '*') {
+    match('*');
+    result *= term2();
+  } 
+  return result;
+}
+
+int term3(void) { 
+  int result = factor();
+  while (token == '@') {
+    match('@');
+    result = ((result + term3())/2);
+  } 
+  return result;
+}
+
+int factor(void) { 
+  int result;
+  if (token == '(') { 
+    match('(');
+    result = expr();
+    match(')');
+  } else {
+    result = number();
+  }
+  return result;
+}
+
+
 Problem 9:
 
 Write regular expressions to match the following -- You should test your solutions using rubular.
@@ -204,7 +347,7 @@ Problem 9 Answer:
 a. ^[_a-z][a-zA-Z0-9_]+$
 b. ((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1
 c. a*(ba*ba*)*a*
-d. 
+d. ab*(abc*cab*)*abc*
 https://www.metaltoad.com/blog/regex-quoted-string-escapable-quotes
 
 Problem 10:
@@ -295,19 +438,3 @@ c.	w  *  x  *  y  ^  z
 d.  w  *  x  /  y  *  z
 	((w * x) / (y * z))
 	w x * y z * /
-
-
-
-1	x
-2	x
-3
-4
-5
-6
-7
-8
-9	x ~
-10	x
-11	x
-12  x
-13	x
