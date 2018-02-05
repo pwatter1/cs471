@@ -193,6 +193,11 @@ zip([1],[a],Zs) should give Zs = [(1,a)]
 NOTE: You may assume X and Y have the same length. */
 
 /* Problem 6 Answer: */
+zip(_, [], []).
+zip([], _, []).
+zip([First|X], [Second|Y], [(First, Second)|Z]) :- 
+  same_length([First|X], 
+  [Second|Y]), zip(X, Y, Z).
 
 /* Problem 6 Test: */
 %:- zip([1,2,3],[a,b,c],[(1,a),(2,b),(3,c)]). % SUCCEED
@@ -211,6 +216,9 @@ zip2([1,2,3,4],[a,b,c],Zs) should give Zs = [(1,a),(2,b),(3,c)]
 zip2([1],[a,b],Zs) should give Zs = [(1,a)] */
 
 /* Problem 7 Answer: */
+zip2([], _, []).
+zip2(_, [], []).
+zip2([First|X], [Second|Y], [(First,Second)|Z]) :- zip2(X, Y, Z).
 
 /* Problem 7 Test: */
 %:- zip2([1,2,3],[a,b,c],[(1,a),(2,b),(3,c)]). % SUCCEED
@@ -230,14 +238,14 @@ merge([10,3,2], [11,5,2], M) should give M =[11,10,5,3,2,2].
  */
 
 /* Problem 8 Answer: */
+merge([],[],[]).
 merge([],L,L).
 merge(L,[],L).
-merge([Head1|Tail1], [Head2|Tail2], L) :- 
-    Head1 < Head2 -> L = [Head1|R], merge(Tail1,[Head2|Tail2],R) ;
-    Head1 > Head2 -> L = [Head2|R], merge([Head1|Tail1],Tail2,R) ;
-    L = [Head1,Head2|R], merge(Tail1,Tail2,R).
+merge([H1|T1], [H2|T2], [H1|R]) :- H1 >= H2, !, merge(T1, [H2|T2], R).
+merge([H1|T1], [H2|T2], [H2|R]) :- merge([H1|T1], T2, R).
 
 % https://stackoverflow.com/questions/15926034/how-to-merge-lists-in-prolog
+% http://www.dailyfreecode.com/code/prolog-merge-two-ordered-list-3129.aspx
 
 /* Problem 8 Test: */
 %:- merge([10,3,2],[11,5,2],[11,10,5,3,2,2]) .       % SUCCEED
@@ -255,6 +263,8 @@ merge([Head1|Tail1], [Head2|Tail2], L) :-
 */
 
 /* Problem 9 Answer: */
+greater_than(succ(_), 0).
+greater_than(succ(X), succ(Y)):- greater_than(X, Y).
 
 /* Problem 9 Test: */
 % :- greater_than(succ(succ(succ(0))),succ(0)).        % SUCCEED
@@ -275,7 +285,12 @@ merge([Head1|Tail1], [Head2|Tail2], L) :-
 
 
 /* Problem 10 Answer: */
-
+subtract(X, 0, X).
+subtract(X, Y, Z) :-
+  succ(PredY, Y),
+  succ(PredX, X),
+  subtract(PredX, PredY, Z).
+  
 /* Problem 10 Test: */
 % :- subtract(succ(succ(0)), succ(0), succ(0)).       % SUCCEED
 % :- subtract(succ(succ(0)), 0, succ(succ(0))).       % SUCCEED
