@@ -64,18 +64,16 @@ can be encoded as node(5,node(3,node(1,nil,nil),node(4,nil,nil)),node(7,nil,nil)
 Write a predicate insert(X,Y,Z) that succeeds if Z is the tree Y with X inserted (insert X into Y). You may assume you have a binary search tree. */
 
 /* Problem 1 Answer: */
-insert(X, node(X, nill, nill), node(X, nill, nill)).
-insert(X, Tree, Tree) :- Tree = node(X, _, _).
-insert(X, node(K, L, R), node(K, Lnew, R)) :-
- X < K, insert(X, L, Lnew).
-insert(X, node(K, L, R), node(K, L, Rnew)) :-
- X > K, bstinsert(X, R, Rnew).
+insert(X, node(X, _, _), node(X, _, _)).
+insert(X, nil, node(X, nil, nil)).
+insert(X, node(T, L, G), node(T, Aux, G)) :- X < T, !, insert(X, L, Aux).
+insert(X, node(T, L, G), node(T, L, Aux)) :- insert(X, G, Aux).
 
 /* Problem 1 Test: */
 :- insert(5,node(5,nil,nil),X), X = node(5,nil,nil).                                                                            %SUCCEED
-:- insert(3,node(5,nil,nil),X).                                                                %SUCCEED
-% :- insert(7,node(5,nil,nil),X), X = node(5,nil,node(7,nil,nil)).                                                                %SUCCEED
-% :- insert(1,node(5,node(3,nil,nil),node(7,nil,nil)),X), X = node(5,node(3,node(1,nil,nil),nil),node(7,nil,nil)).                 %SUCCEED
+:- insert(3,node(5,nil,nil),_).    %SUCCEED
+:- insert(7,node(5,nil,nil),X), X = node(5,nil,node(7,nil,nil)).                                                                %SUCCEED
+:- insert(1,node(5,node(3,nil,nil),node(7,nil,nil)),X), X = node(5,node(3,node(1,nil,nil),nil),node(7,nil,nil)).                 %SUCCEED
 % :- insert(1,node(5,node(3,node(2,nil,nil),nil),node(7,nil,nil)),X), X = node(5,node(3,node(2,node(1,nil,nil),nil),nil),node(7,nil,nil)). %SUCCEED
 
 % :- (insert(3,node(5,node(3,node(2,nil,nil),nil),node(7,nil,nil)),X), X = node(5,node(3,node(2,node(3,nil,nil),nil)),node(7,nil,nil))) -> fail ; true.
@@ -89,15 +87,18 @@ For example...
 to_list(node(5,node(3,node(1,nil,nil),node(4,nil,nil)),node(7,nil,nil)),X) will succeed with X = [1,3,4,5,7]. */
 
 /* Problem 2 Answer:  */
-
+to_list(nil, []).
+to_list(node(Data, Left, Right), List) :-
+  to_list(Left, X),
+  to_list(Right, Y),
+  append(X, [Data|Y] , List).
 
 
 /* Problem 2 Tests:  */
-%:- to_list(node(3,nil,nil),L), L = [3]. %SUCCEED
-%:- to_list(node(5,node(3,nil,nil),nil),L), L = [3,5].  %SUCCEED
-%:- to_list(node(5,node(3,node(1,nil,nil),node(4,nil,nil)),node(7,nil,nil)),L), L = [1,3,4,5,7]. %SUCCEED
-
-%:- (to_list(node(3,nil,nil),L), L = [5]) -> fail ; true.
+:- to_list(node(3,nil,nil),L), L = [3]. %SUCCEED
+:- to_list(node(5,node(3,nil,nil),nil),L), L = [3,5].  %SUCCEED
+:- to_list(node(5,node(3,node(1,nil,nil),node(4,nil,nil)),node(7,nil,nil)),L), L = [1,3,4,5,7]. %SUCCEED
+:- (to_list(node(3,nil,nil),L), L = [5]) -> fail ; true.
 
 
 /* Problem 3:
@@ -328,9 +329,21 @@ my_max1(X,_,X).
 
 /* Problem 10 Answer: */
 
+sendMoreMoney(Digits) :-
+   Digits in 0..9,
+   S #\= 0,
+   M #\= 0,
+   all_different(Digits),
+                1000*S + 100*E + 10*N + D
+              + 1000*M + 100*O + 10*R + E
+   #= 10000*M + 1000*O + 100*N + 10*E + Y,
+   label(Digits).
+
+% https://gist.github.com/yuce/9098ac5b7b744500dc80
+
 /* Problem 10 Test: */
 
-% :- M = 1, sendMoreMoney( [D,E,M,N,O,R,S,Y]), M = 1, D = 7, E = 5, N = 6, O = 0, R = 8, S = 9, Y = 2.
+:- M = 1, sendMoreMoney([D,E,M,N,O,R,S,Y]), M = 1, D = 7, E = 5, N = 6, O = 0, R = 8, S = 9, Y = 2.
 
 /* Problem 11:
 
